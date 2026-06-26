@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "example-skill",
+  "description": "An example plugin showing the skill folder layout.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Janos Gabler",
+    "email": "j.Gabler@appliedai-institute.de"
+  },
+  "license": "MIT"
+}
