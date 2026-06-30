@@ -44,10 +44,12 @@ small and non-breaking for as long as possible:
    new so nothing public changes yet.
 4. **Make the public surface accept the new types** — public functions now accept *both* old
    and new (generous inputs). Still non-breaking.
-5. **Deprecate the old paths** (libraries) — old inputs keep working but emit
-   `DeprecationWarning`; docs switch to featuring the new way.
-6. **Remove deprecated paths** — only in the targeted future release; usually its own much
-   later PR, often out of scope for the current effort.
+5. **Apply the compatibility decision** (libraries) — per the proposal, for each old path:
+   *deprecate* (keep it working + `DeprecationWarning`, docs feature the new way) or *keep*
+   (both supported, no warning). Paths marked *drop* are the breaking changes.
+6. **Remove dropped/deprecated paths** — *drop* lands in the agreed PR (per the decision);
+   *deprecate* is removed only in the targeted future release (usually a much later PR, often
+   out of scope now); *kept* paths are never removed.
 
 Remove a module from the mypy exemption list **in the same PR** that converts it (the ratchet
 only shrinks).
@@ -89,8 +91,9 @@ and call out which steps are independent.
 
 - **Each step keeps the repo green.** No step may leave imports broken or tests failing.
 - **Smallest reviewable PRs that still make sense.** Bias to more, smaller steps.
-- **Respect the proposal's breaking-changes decision.** If deprecation was required, no step
-  may break a public interface; if breaking is allowed, don't add needless shims.
+- **Respect the proposal's compatibility decision.** Don't break an interface marked
+  *deprecate* or *keep*; don't add deprecation shims for one marked *drop* or for
+  internal-only code.
 - **Don't re-design here.** If the proposal is ambiguous or you'd change the type design,
   stop and raise it with the user rather than deciding silently — that belongs in
   `design-proposal`.

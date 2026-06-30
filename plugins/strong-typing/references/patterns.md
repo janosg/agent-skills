@@ -278,7 +278,48 @@ argument rather than removing it outright (for libraries).
 
 ---
 
-## 10. Generous-in / strict-out boundary
+## 10. Pluggable behavior (`str | Callable` + options dict) → configured strategy object
+
+**Smell:** a pluggable strategy chosen by a string or a raw callable, *plus* a separate
+options dict to configure it. The selector is stringly-typed, the options are brittle and
+don't autocomplete, and the two are coupled yet passed separately.
+
+```python
+# before
+def run(..., method: str | Callable = "lbfgsb", options: dict | None = None): ...
+run(..., method="lbfgsb", options={"max_iter": 1000})
+```
+
+```python
+# after: the strategy IS a frozen dataclass — config as fields, behavior as a method
+from typing import Protocol
+
+class Optimizer(Protocol):
+    def __call__(self, problem: Problem) -> Result: ...
+
+@dataclass(frozen=True)
+class Lbfgsb:
+    max_iter: int = 1000
+    def __post_init__(self): assert self.max_iter > 0
+    def __call__(self, problem: Problem) -> Result: ...   # the behavior lives here
+
+def run(..., method: Optimizer): ...
+run(..., method=Lbfgsb(max_iter=1000))      # one validated, autocompleting object
+```
+
+**When:** any strategy/plugin point where you'd otherwise pair a `str`/`Callable` selector
+with an options dict. Bundling configuration (frozen fields, validated in `__post_init__`,
+discoverable via autocomplete) *with* behavior (the method) into one immutable object replaces
+both the selector and the dict. Fix the method name with a `Protocol` or ABC so all strategies
+are interchangeable. By the boundary pattern below (and principle 4), a widely-used entry point
+can *also* accept the bare `str`/`Callable` for convenience and normalize to the object —
+generous in, strict core. This is how optimagic models algorithms, benchmark noise, scalers,
+and loggers. Don't apply it where the behavior has no configuration or variants — a plain
+function is enough.
+
+---
+
+## 11. Generous-in / strict-out boundary
 
 The pattern that ties the others together. The *public* function accepts a forgiving union
 and returns a strict type; it converts once, then hands a clean type to strict internals.
@@ -314,4 +355,5 @@ also where runtime validation lives.
 | ordered-lifecycle object + rules | typestate / context manager | the states aren't mutually exclusive |
 | mutated config | `frozen=True` + `with_*` | it genuinely must mutate in place |
 | `flag` + `flag_options` dict | `bool \| OptionsObject` | — |
+| pluggable `str`/`Callable` + options dict | configured strategy object (frozen dataclass + `__call__`, fixed by a `Protocol`) | the behavior has no config/variants |
 | loose union in a public return | a strict result type | the output really is heterogeneous |

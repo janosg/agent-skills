@@ -34,12 +34,17 @@ Default to the **current diff / PR**. Whole-repo on request. State the scope use
       lives only at the boundary, not scattered through the core
 - [ ] conversion happens **once**, at the edge, not repeatedly deep in the call tree
 
-## 3. Backwards compatibility & deprecation (libraries)
+## 3. Backwards compatibility (libraries)
 
-- [ ] no public interface was **narrowed/broken** unless the proposal allows breaking changes
-- [ ] where deprecation is required: old inputs **still work**, emit a `DeprecationWarning`
-      (not a hard error), and convert to the new type
-- [ ] deprecation warnings name the **replacement** and a **removal target**
+Check each change against the proposal's per-interface decision (**drop** / **deprecate** /
+**keep**):
+
+- [ ] interfaces marked **deprecate** or **keep** **still work** (old inputs accepted and
+      converted to the new type); they were not silently broken
+- [ ] **deprecate**: emits a `DeprecationWarning` (not a hard error) naming the **replacement**
+      and a **removal target**
+- [ ] **keep**: works with **no** warning; both paths supported
+- [ ] only interfaces marked **drop** were broken/removed — and only where the proposal allows
 - [ ] new required arguments have safe defaults / aren't forced on existing callers
 - [ ] for internal-only interfaces, confirm shims **weren't** added needlessly (don't
       over-engineer compatibility no one needs)

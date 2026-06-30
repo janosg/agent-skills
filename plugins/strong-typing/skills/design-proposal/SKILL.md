@@ -33,14 +33,20 @@ First determine **repo type**, because it changes how much of the proposal you w
 
 If it's ambiguous, ask the user.
 
-Then ask the user the **breaking-changes question up front** (skip for clearly-internal
-code where it's obviously fine to break):
+Then ask the user the **backwards-compatibility question up front** (skip for clearly-internal
+code where it's obviously fine to break). For each affected public interface — or as a global
+default — which applies:
 
-> Are breaking changes to the public API acceptable, or must changes go through a
-> deprecation period (old interface keeps working with a warning for a release or two)?
+> - **Drop** it — a clean breaking change; the old interface is removed now.
+> - **Deprecate** it — the old interface keeps working but emits a `DeprecationWarning` for a
+>   release or two, then is removed.
+> - **Keep** it indefinitely — both the old and new interfaces are supported for the
+>   foreseeable future.
 
-Record the answer — it shapes every public-facing section. If deprecation is required, every
-public change must keep the old path working (lean on "generous inputs").
+This depends on context outside the code (how many users the project has, its stability
+promises, release cadence) — so **ask, don't assume.** Record the answer; it shapes every
+public-facing section and the summaries at the end. For interfaces marked *deprecate* or
+*keep*, every public change must keep the old path working (lean on "generous inputs").
 
 ## 2. Audit the stringly-typed surface
 
@@ -68,8 +74,8 @@ spots that should be *left alone*, so they don't get "fixed" later.
 Write to a markdown file in the repo (e.g. `docs/strong-typing-proposal.md`, or follow the
 repo's existing proposal/EP location if one exists). Structure, per the optimagic EP model:
 
-- **Title + status table** (Author, Status: Draft, Created date, repo type, breaking-changes
-  decision).
+- **Title + status table** (Author, Status: Draft, Created date, repo type, and the
+  compatibility decision — drop / deprecate / keep, per interface or as a default).
 - **Abstract** — the benefits being pursued: IDE discoverability/autocomplete, readability,
   robustness via static + stricter internal types. State that this needs more than adding
   hints.

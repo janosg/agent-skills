@@ -28,26 +28,38 @@ is choosing the right data types.
    genuinely dynamic, unknown, or user-defined, **keep the dict.** Getting this distinction
    right is the single most important judgment call. See `when-not-to-convert.md`.
 
-4. **Generous inputs, strict outputs.**
-   - *Public* functions are generous about input types (e.g. accept a `str`, a class, or a
-     config object), then immediately convert to a strict internal type and call internal
-     code.
-   - *Public* functions are strict about output types: not just "the type is known" but a
-     *proper* type that enables static analysis of its attributes (a result dataclass, not a
-     `dict[str, Any]`).
-   - *Internal* functions are strict about **both** input and output. The boundary does the
-     converting and validating; the core stays clean.
+4. **Generous inputs scale with reach; outputs stay strict.** The more widely a function is
+   called, the more generous it should be about its input types — accept the convenient
+   unions (a `str`, a class, a config object) and normalize them to one strict type at the
+   top. A function with a single caller can demand the exact type; one imported all over the
+   codebase (and above all the entry points users touch) should meet its callers where they
+   are. This is *not* a public/private split — plenty of widely-imported functions aren't
+   user-facing; what matters is how many call sites you'd otherwise force to adapt.
+   - **Outputs stay strict regardless of reach:** return a *proper* type that enables static
+     analysis of its attributes (a result dataclass, never a `dict[str, Any]` or a loose
+     union).
+   - Convert and validate **once**, in the outermost generous layer; everything beneath it
+     then enjoys strict-in / strict-out and stays free of input-shape branching.
 
 5. **Immutable by default.** Use `frozen=True` dataclasses unless something genuinely needs
    to mutate. When users need a modified version, give them copy constructors
    (`with_option(...)`, `with_x(...)`) rather than mutation. Mutable shared config is a
    recurring source of bugs (e.g. tweaking one option in a loop silently mutates the rest).
 
-6. **Functions as the main entry point; objects for configuration and results.** This takes
-   the best of both worlds: the safety and autocomplete that (in Python) only objects give,
-   with the beginner-friendliness and composability of functions. A top-level `do_thing()`
-   function that *accepts* config objects beats a `.run()` method on a config object —
-   it's far easier to extend (e.g. run several configs in parallel).
+6. **Functions as the main entry point; objects for configuration, strategies, and results.**
+   This takes the best of both worlds: the safety and autocomplete that (in Python) only
+   objects give, with the beginner-friendliness and composability of functions. A top-level
+   `do_thing()` function that *accepts* config objects beats a `.run()` method on a config
+   object — it's far easier to extend (e.g. run several configs in parallel).
+   - For *pluggable behavior* (the strategy pattern), libraries commonly accept
+     `str | Callable` plus a separate options dict. Prefer a **configured strategy object**: a
+     frozen dataclass whose fields are the configuration and which carries the behavior as a
+     method — often `__call__`, or a named method fixed by a `Protocol`/ABC. One immutable,
+     validated, autocomplete-friendly object then replaces *both* the string selector and the
+     loose options dict (e.g. `strategy=Lbfgsb(max_iter=1000)` instead of
+     `strategy="lbfgsb", options={...}`). Per point 4, a widely-used entry point can still
+     also accept the bare `str`/`Callable` for convenience and normalize to the object. See
+     `patterns.md`.
 
 7. **Construction functions over overloaded `__init__`.** Python has no constructor
    overloading. When an object can be built in several ways, prefer explicitly named
@@ -59,11 +71,15 @@ is choosing the right data types.
    the types now "say" it can't happen. Validate at the public boundary and in
    `__post_init__`; give early, friendly errors.
 
-9. **Backwards compatibility is a first-class constraint (for libraries).** It is fine to
-   keep supporting non-ideal-but-popular interfaces (selecting things by string, accepting
-   option dicts) for compatibility. Make the *strict, autocomplete-friendly* way the one the
-   docs show prominently; keep the legacy way working but de-emphasized, and remove it only
-   through a real deprecation cycle.
+9. **The backwards-compatibility strategy is a decision, not a default — ask.** Whether an
+   old interface should be *dropped* (clean breaking change), *deprecated* (keeps working with
+   a warning for a release or two, then removed), or *kept indefinitely* (both ways supported
+   for the foreseeable future) depends on context that isn't in the code: how many users the
+   project has, its stability promises, its release cadence. Don't assume — ask the maintainer
+   and record the answer. Independently of which is chosen, it's fine to keep supporting
+   non-ideal-but-popular interfaces (selecting by string, accepting option dicts) for
+   convenience, and the docs should feature the *strict, autocomplete-friendly* way most
+   prominently while any legacy way is de-emphasized.
 
 10. **Optimize for the reader and the IDE, not for type-hint maximalism.** Every type
     decision should pay off in one of: a prevented bug, better autocomplete/discoverability,

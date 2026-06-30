@@ -41,8 +41,10 @@ Apply the relevant patterns from `patterns.md`:
   `bool | OptionsObject` for flag+options pairs; generous-in/strict-out at public boundaries.
 - Respect `when-not-to-convert.md`: leave dynamic-key dicts, honest `Any`, and
   genuinely-mutable state alone. Do not "improve" them.
-- For libraries under a deprecation requirement: keep old inputs working, add the
-  `DeprecationWarning`, convert old→new at the boundary.
+- Honor the proposal's compatibility decision for each public interface: **drop** → remove the
+  old path (only where the proposal allows breaking); **deprecate** → keep it working and emit
+  a `DeprecationWarning`, converting old→new at the boundary; **keep** → keep it working with
+  no warning. Never silently break an interface marked deprecate or keep.
 - Keep runtime validation; add `__post_init__` checks for invariants.
 - Remove the mypy exemption for any module this step finishes (the ratchet).
 

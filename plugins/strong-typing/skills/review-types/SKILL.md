@@ -36,6 +36,8 @@ do that instead. State which scope you used.
 - [ ] same-typed **IDs/units** that can be swapped at a call site → `NewType`
 - [ ] public function returning `dict[str, Any]` or a loose `Union` → a strict result type
 - [ ] `__init__` with many mutually-exclusive optional params → construction functions
+- [ ] a pluggable strategy as `str`/`Callable` **+ a separate options dict** → a configured
+      strategy object (frozen dataclass + `__call__`, fixed by a `Protocol`)
 - [ ] stray `Any`/missing hints where a precise type is known and cheap
 
 ## 3. Over-typing checklist (strict → should be loose) — weight heavily
