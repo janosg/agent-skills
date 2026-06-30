@@ -54,7 +54,8 @@ Reason about what an editor (Pylance/pyright, PyCharm) would show a caller:
 - [ ] docstrings/examples that **feature the stringly-typed / dict path** instead of the
       strict, autocomplete-friendly one → the discoverable way should be shown first; legacy
       shown in tabs/expandable blocks, not removed (for libraries).
-- [ ] public types/fields **missing docstrings** where the meaning isn't obvious from the name.
+- [ ] public types/fields **missing docstrings** where the meaning isn't obvious from the name —
+      document dataclass fields with **per-attribute docstrings**, not one class-level block.
 - [ ] examples that **don't import/use the new types**, so readers never learn the good path.
 - [ ] generated/stub considerations: if codegen produces the public types, confirm the result
       is what an editor sees (the user shouldn't be able to tell it was generated).

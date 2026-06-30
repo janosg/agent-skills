@@ -84,11 +84,49 @@ Once types carry the information, the docs should lean on them:
 
 - **Remove type information from docstrings.** Types live in the signature; duplicating them
   in prose just rots. Keep docstrings for *meaning*, not types.
+- **Document dataclass fields with a docstring *per attribute*, not one giant class
+  docstring.** The class docstring covers the type as a whole — its purpose, behavior, and any
+  cross-field rules; each field then carries its own docstring placed directly beneath it.
+  Per-attribute docstrings are what an editor surfaces on hover for that specific field, and
+  they don't rot into a stale wall of text the way a monolithic `Attributes:` block does.
+  Describe meaning, ranges, and interactions — not the type, which is already in the annotation.
 - **Feature the strict, autocomplete-friendly way most prominently.** When multiple input
   styles are supported (e.g. object vs string vs dict), show the discoverable one first;
   hide legacy/compat styles in tabs or expandable boxes rather than removing them.
 - **Let autocomplete be the docs.** A configured-object API means options are discoverable in
   the editor; make sure the public types actually surface them (see `review-ergonomics`).
+
+Per-attribute docstrings in practice — the class docstring explains the whole; each field
+documents itself:
+
+```python
+from dataclasses import dataclass
+from typing import ClassVar
+
+
+@dataclass(frozen=True)
+class ExponentialBackoff:
+    """Retry policy whose wait grows geometrically between attempts.
+
+    Each failed attempt waits `factor` times longer than the previous one,
+    starting from `base_delay`. Retrying stops once `max_attempts` is reached;
+    if `max_attempts` is None, the number of attempts is unbounded.
+    """
+
+    name: ClassVar[str] = "exponential"
+
+    base_delay: float = 0.1
+    """Delay before the first retry, in seconds. Must be >= 0."""
+
+    factor: float = 2.0
+    """Multiplier applied to the delay after each failed attempt. Must be > 1."""
+
+    max_attempts: int | None = None
+    """Hard cap on the number of attempts.
+
+    If None, the number of attempts is unbounded.
+    """
+```
 
 ## Checklist
 
@@ -99,3 +137,4 @@ Once types carry the information, the docs should lean on them:
 - [ ] Low-level/leaf modules converted first.
 - [ ] Runtime validation retained at boundaries and in `__post_init__`.
 - [ ] Type info removed from docstrings; strict path featured in docs.
+- [ ] Dataclass fields documented with per-attribute docstrings, not one class-level block.

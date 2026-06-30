@@ -40,6 +40,11 @@ Compare with `is`, not `==`. (`Literal["raise", "continue"]` is a lighter altern
 you don't need a real object — good for simple flags, but an Enum gives you a namespace,
 autocomplete, and a place to hang helpers.)
 
+**Not for selecting behavior.** An Enum enumerates a closed set of *values*; it can't carry
+behavior or per-choice configuration. When a string selects *which code runs* — the
+`str | Callable` smell, e.g. choosing an algorithm, backend, or strategy — don't model it as
+an Enum; use a configured strategy object (pattern 9).
+
 ---
 
 ## 2. Dict with known keys → frozen dataclass
@@ -246,8 +251,7 @@ def fetch(..., cache: bool | CacheOptions = False): ...
 
 **When:** any "enable + configure" pair. Collapse to `bool | OptionsObject`: `False`/`True`
 keep the zero-import easy path, the object gives discoverable, validated, immutable config.
-Same idea for `logging: bool | str | Path | Logger`, etc. Deprecate the old `_options`
-argument rather than removing it outright (for libraries).
+Same idea for `logging: bool | str | Path | Logger`, etc.
 
 ---
 
@@ -289,6 +293,11 @@ can *also* accept the bare `str`/`Callable` for convenience and normalize to the
 generous in, strict core. This fits compression backends, retry policies, serializers,
 samplers, and similar pluggable components. Don't apply it where the behavior has no
 configuration or variants — a plain function is enough.
+
+**Prefer this over an enum of methods.** An Enum can name *which* strategy but can't run it or
+hold its configuration — you'd still need a dispatch table from each member to its
+implementation plus a separate options dict. A configured strategy object bundles the behavior
+with its validated config, so it replaces both the selector and the dict.
 
 ---
 
