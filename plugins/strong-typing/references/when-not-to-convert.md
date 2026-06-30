@@ -52,8 +52,6 @@ telling you to refactor the function, not to write a bigger `Union`.
 
 ## Don't add ceremony that prevents no real error
 
-- **`NewType` only where confusion actually happens.** Wrapping every `int` in a distinct
-  type is noise. Use it for IDs/units that genuinely get swapped.
 - **An Enum/dataclass with a single member or single use** rarely earns its keep — a
   `Literal` or a plain value may be clearer.
 - Each new type should buy a prevented bug, better autocomplete, or clearer code. If it buys
@@ -97,7 +95,7 @@ often couples things that should stay independent.
 A change is **over-converted** if any of these is true:
 - a dict whose keys are dynamic/user-defined was frozen into a dataclass/`TypedDict`;
 - a type acquired deep nesting instead of a named intermediate or a looser type;
-- a `NewType`/Enum/dataclass was added where no real misuse was possible;
+- an Enum/dataclass was added where no real misuse was possible;
 - `frozen=True` was forced onto something that genuinely needs mutation, adding awkward copies;
 - a public signature got *stricter* (narrower input) without a deprecation path;
 - runtime validation was dropped in favor of "the types cover it";

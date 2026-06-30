@@ -141,34 +141,7 @@ several unions. Great for config versioning (`Config = ConfigV1 | ConfigV2`) and
 
 ---
 
-## 5. Interchangeable scalars → `NewType`
-
-**Smell:** several conceptually-distinct values share a primitive type (`int`, `str`,
-`float`), so the checker can't stop you swapping them.
-
-```python
-# before
-def get_ride_info(self, car_id: int, driver_id: int) -> RideInfo: ...
-info = db.get_ride_info(driver_id, car_id)   # swapped — no error
-```
-
-```python
-# after
-from typing import NewType
-CarId = NewType("CarId", int)
-DriverId = NewType("DriverId", int)
-
-def get_ride_info(self, car_id: CarId, driver_id: DriverId) -> RideInfo: ...
-info = db.get_ride_info(driver_id, car_id)   # type error
-```
-
-**When:** many same-typed IDs, or units that must not be mixed (`Meters` vs `Seconds`,
-`Normalized` vs `Pixels`). Zero runtime cost. Don't sprinkle it on every int — reserve it
-for values that actually get confused in practice.
-
----
-
-## 6. Overloaded `__init__` → named construction functions
+## 5. Overloaded `__init__` → named construction functions
 
 **Smell:** one `__init__` with many optional, mutually-exclusive parameters; invalid
 combinations (`y1` with `width`) are constructible.
@@ -191,7 +164,7 @@ the intent obvious and makes invalid field mixes unconstructible.
 
 ---
 
-## 7. Mutable god-object across phases → typestate
+## 6. Mutable god-object across phases → typestate
 
 **Smell:** one class with a documented "call these in this order, never call X after Y"
 rulebook, enforced (if at all) by runtime asserts and boolean flags.
@@ -225,7 +198,7 @@ illegal sequences unrepresentable instead of runtime-checked.
 
 ---
 
-## 8. Mutable config → immutable + copy constructors
+## 7. Mutable config → immutable + copy constructors
 
 **Smell:** option dicts/objects mutated in place; looping over variants accidentally shares
 state.
@@ -250,7 +223,7 @@ validate and strip a common prefix to recreate namespaces ergonomically.
 
 ---
 
-## 9. `flag: bool` + `flag_options: dict` pair → one generous argument
+## 8. `flag: bool` + `flag_options: dict` pair → one generous argument
 
 **Smell:** two coupled arguments — one to switch a feature on, one dict to configure it.
 Setting the options without the flag silently does nothing; the dict is brittle.
@@ -278,7 +251,7 @@ argument rather than removing it outright (for libraries).
 
 ---
 
-## 10. Pluggable behavior (`str | Callable` + options dict) → configured strategy object
+## 9. Pluggable behavior (`str | Callable` + options dict) → configured strategy object
 
 **Smell:** a pluggable strategy chosen by a string or a raw callable, *plus* a separate
 options dict to configure it. The selector is stringly-typed, the options are brittle and
@@ -319,7 +292,7 @@ configuration or variants — a plain function is enough.
 
 ---
 
-## 11. Generous-in / strict-out boundary
+## 10. Generous-in / strict-out boundary
 
 The pattern that ties the others together. The *public* function accepts a forgiving union
 and returns a strict type; it converts once, then hands a clean type to strict internals.
@@ -350,7 +323,6 @@ also where runtime validation lives.
 | `dict` with known fixed keys | frozen `dataclass` | keys are dynamic → keep dict / `TypedDict` |
 | `tuple` of 3+ unnamed values | `dataclass` | you truly need tuple behavior → `NamedTuple` |
 | "kind" + optional fields | tagged union + `assert_never` | the set of kinds is open-ended |
-| many same-typed IDs/units | `NewType` | they're never actually confused |
 | many-optional `__init__` | `@classmethod` constructors | one obvious construction path |
 | ordered-lifecycle object + rules | typestate / context manager | the states aren't mutually exclusive |
 | mutated config | `frozen=True` + `with_*` | it genuinely must mutate in place |

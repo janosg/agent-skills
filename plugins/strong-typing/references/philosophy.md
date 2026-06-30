@@ -88,7 +88,7 @@ is choosing the right data types.
 ## How the pieces fit together
 
 - `patterns.md` — the before/after catalog: the concrete transformations that implement
-  these principles (string→enum, dict→dataclass, tuple→dataclass, tagged unions, `NewType`,
+  these principles (string→enum, dict→dataclass, tuple→dataclass, tagged unions,
   construction functions, typestate, copy constructors, generous-in/strict-out boundaries).
 - `when-not-to-convert.md` — the guardrails: where a dict / `Any` / mutability / a loose type
   is the *correct* choice, and how to avoid over-engineering.

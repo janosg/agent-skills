@@ -57,7 +57,6 @@ Survey the code and inventory the conversion opportunities. Look for:
   **dynamic** (those stay dicts; call them out so nobody converts them)
 - **tuples** of 3+ unnamed values (→ dataclass/NamedTuple)
 - "**kind**" fields + optionally-present attributes (→ tagged union + `assert_never`)
-- same-typed **IDs/units** that could be swapped (→ `NewType`)
 - `__init__`s with many mutually-exclusive optional params (→ construction functions)
 - **mutable config** / option dicts (→ frozen dataclass + copy constructors)
 - **`flag: bool` + `flag_options: dict`** pairs (→ `bool | OptionsObject`)

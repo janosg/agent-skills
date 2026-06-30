@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Execute ONE step of a strong-typing implementation plan — applying the dataclass/enum/union/NewType conversions for that step only, keeping the codebase green, without running ahead to other steps. Use when the user wants to carry out a planned type refactor, implement the next PR of the typing migration, or convert a specific module/component to strong typing. Applies the shared design philosophy so it isn't restated in the plan. Triggers: "implement step N", "do the next step of the typing plan", "carry out the strong typing migration", "convert this module to strongly typed".
+description: Execute ONE step of a strong-typing implementation plan — applying the dataclass/enum/union conversions for that step only, keeping the codebase green, without running ahead to other steps. Use when the user wants to carry out a planned type refactor, implement the next PR of the typing migration, or convert a specific module/component to strong typing. Applies the shared design philosophy so it isn't restated in the plan. Triggers: "implement step N", "do the next step of the typing plan", "carry out the strong typing migration", "convert this module to strongly typed".
 ---
 
 # Strong Typing — Implement
@@ -36,7 +36,7 @@ substance, stop and ask.
 Apply the relevant patterns from `patterns.md`:
 
 - frozen dataclasses for known-field structures; `Enum`/`Literal` for closed string choices;
-  tagged unions + `assert_never` for variant sets; `NewType` for confusable scalars;
+  tagged unions + `assert_never` for variant sets;
   construction functions over many-optional `__init__`; copy constructors for config;
   `bool | OptionsObject` for flag+options pairs; generous-in/strict-out at public boundaries.
 - Respect `when-not-to-convert.md`: leave dynamic-key dicts, honest `Any`, and

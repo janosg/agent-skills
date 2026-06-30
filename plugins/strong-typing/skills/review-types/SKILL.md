@@ -1,6 +1,6 @@
 ---
 name: review-types
-description: Review code for whether the RIGHT types and data abstractions were chosen in a strong-typing context — catching both under-typing (dicts/tuples/strings that should be dataclasses/enums/unions) AND over-typing (dynamic dicts wrongly frozen into dataclasses, needless NewTypes, forced immutability, harmful subclassing). Use to review a strong-typing diff/PR or a module for correct type and abstraction choices. Reviews, does not rewrite. Triggers: "review the types", "did I pick the right types", "check this for over/under-typing", "review this strong-typing PR for type choices".
+description: Review code for whether the RIGHT types and data abstractions were chosen in a strong-typing context — catching both under-typing (dicts/tuples/strings that should be dataclasses/enums/unions) AND over-typing (dynamic dicts wrongly frozen into dataclasses, forced immutability, harmful subclassing). Use to review a strong-typing diff/PR or a module for correct type and abstraction choices. Reviews, does not rewrite. Triggers: "review the types", "did I pick the right types", "check this for over/under-typing", "review this strong-typing PR for type choices".
 ---
 
 # Strong Typing Review — Type & Abstraction Choices
@@ -33,7 +33,6 @@ do that instead. State which scope you used.
       dict is structurally required)
 - [ ] **tuple** of 3+ unnamed values → dataclass / `NamedTuple`
 - [ ] "**kind**"/type field + conditionally-present attributes → tagged union + `assert_never`
-- [ ] same-typed **IDs/units** that can be swapped at a call site → `NewType`
 - [ ] public function returning `dict[str, Any]` or a loose `Union` → a strict result type
 - [ ] `__init__` with many mutually-exclusive optional params → construction functions
 - [ ] a pluggable strategy as `str`/`Callable` **+ a separate options dict** → a configured
@@ -46,7 +45,7 @@ do that instead. State which scope you used.
       dict (`dict[str, ValueType]`, strict on value, loose on keys)
 - [ ] a type that grew **deeply nested generics** instead of a named intermediate or a
       deliberately looser type
-- [ ] a **`NewType`/Enum/dataclass added where no real misuse was possible** (ceremony with no
+- [ ] an **Enum/dataclass added where no real misuse was possible** (ceremony with no
       prevented bug, autocomplete, or clarity gain)
 - [ ] **`frozen=True` forced** onto something that genuinely mutates, producing awkward copies
 - [ ] **`Any` laundered** into a fake-precise type across a genuinely dynamic boundary (prefer
