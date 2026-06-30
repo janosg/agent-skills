@@ -72,7 +72,7 @@ spots that should be *left alone*, so they don't get "fixed" later.
 ## 3. Write the proposal
 
 Write to a markdown file in the repo (e.g. `docs/strong-typing-proposal.md`, or follow the
-repo's existing proposal/EP location if one exists). Structure, per the optimagic EP model:
+repo's existing proposal/EP location if one exists). Structure it as an enhancement proposal:
 
 - **Title + status table** (Author, Status: Draft, Created date, repo type, and the
   compatibility decision — drop / deprecate / keep, per interface or as a default).

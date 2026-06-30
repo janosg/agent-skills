@@ -233,15 +233,15 @@ state.
 ```python
 # after
 @dataclass(frozen=True)
-class Algo:
+class Config:
     max_iter: int = 1000
-    radius: float = 0.1
+    tolerance: float = 0.1
 
-    def with_option(self, **changes) -> "Algo":
+    def with_option(self, **changes) -> "Config":
         return dataclasses.replace(self, **changes)
 
-base = Algo(max_iter=1000)
-variants = [base.with_option(radius=r) for r in (0.1, 0.2, 0.5)]   # base untouched
+base = Config(max_iter=1000)
+variants = [base.with_option(tolerance=t) for t in (0.1, 0.2, 0.5)]   # base untouched
 ```
 
 **When:** configuration objects. `frozen=True` + `dataclasses.replace` (or a `with_*`
@@ -257,18 +257,18 @@ Setting the options without the flag silently does nothing; the dict is brittle.
 
 ```python
 # before
-minimize(..., scaling=True, scaling_options={"method": "bounds", "clip": 1e-8})
+fetch(..., cache=True, cache_options={"backend": "redis", "ttl": 60})
 ```
 
 ```python
 # after
 @dataclass(frozen=True)
-class ScalingOptions:
-    method: str = "bounds"
-    clip: float = 1e-8
+class CacheOptions:
+    backend: str = "memory"
+    ttl: float = 60.0
 
 # bool keeps the easy on/off; the object replaces the dict and enables autocomplete
-def minimize(..., scaling: bool | ScalingOptions = False): ...
+def fetch(..., cache: bool | CacheOptions = False): ...
 ```
 
 **When:** any "enable + configure" pair. Collapse to `bool | OptionsObject`: `False`/`True`
@@ -286,25 +286,25 @@ don't autocomplete, and the two are coupled yet passed separately.
 
 ```python
 # before
-def run(..., method: str | Callable = "lbfgsb", options: dict | None = None): ...
-run(..., method="lbfgsb", options={"max_iter": 1000})
+def save(..., compression: str | Callable = "gzip", options: dict | None = None): ...
+save(..., compression="gzip", options={"level": 9})
 ```
 
 ```python
 # after: the strategy IS a frozen dataclass — config as fields, behavior as a method
 from typing import Protocol
 
-class Optimizer(Protocol):
-    def __call__(self, problem: Problem) -> Result: ...
+class Compressor(Protocol):
+    def __call__(self, data: bytes) -> bytes: ...
 
 @dataclass(frozen=True)
-class Lbfgsb:
-    max_iter: int = 1000
-    def __post_init__(self): assert self.max_iter > 0
-    def __call__(self, problem: Problem) -> Result: ...   # the behavior lives here
+class Gzip:
+    level: int = 6
+    def __post_init__(self): assert 0 <= self.level <= 9
+    def __call__(self, data: bytes) -> bytes: ...   # the behavior lives here
 
-def run(..., method: Optimizer): ...
-run(..., method=Lbfgsb(max_iter=1000))      # one validated, autocompleting object
+def save(..., compression: Compressor): ...
+save(..., compression=Gzip(level=9))      # one validated, autocompleting object
 ```
 
 **When:** any strategy/plugin point where you'd otherwise pair a `str`/`Callable` selector
@@ -313,9 +313,9 @@ discoverable via autocomplete) *with* behavior (the method) into one immutable o
 both the selector and the dict. Fix the method name with a `Protocol` or ABC so all strategies
 are interchangeable. By the boundary pattern below (and principle 4), a widely-used entry point
 can *also* accept the bare `str`/`Callable` for convenience and normalize to the object —
-generous in, strict core. This is how optimagic models algorithms, benchmark noise, scalers,
-and loggers. Don't apply it where the behavior has no configuration or variants — a plain
-function is enough.
+generous in, strict core. This fits compression backends, retry policies, serializers,
+samplers, and similar pluggable components. Don't apply it where the behavior has no
+configuration or variants — a plain function is enough.
 
 ---
 
@@ -326,14 +326,14 @@ and returns a strict type; it converts once, then hands a clean type to strict i
 
 ```python
 # public: generous in, strict out
-def minimize(
-    algorithm: Algorithm | type[Algorithm] | str,
-    ...
-) -> OptimizeResult:                 # a proper result type, never dict[str, Any]
-    algo = _coerce_algorithm(algorithm)     # normalize + validate at the boundary
-    return _minimize(algo, ...)             # internal: strict in, strict out
+def save(
+    data: bytes,
+    compression: Compressor | type[Compressor] | str,
+) -> SaveReport:                     # a proper result type, never dict[str, Any]
+    compressor = _coerce_compressor(compression)   # normalize + validate at the boundary
+    return _save(data, compressor)                 # internal: strict in, strict out
 
-def _minimize(algorithm: Algorithm, ...) -> OptimizeResult: ...
+def _save(data: bytes, compression: Compressor) -> SaveReport: ...
 ```
 
 **When:** every public entry point. Keep the convenience (and backwards compatibility) at

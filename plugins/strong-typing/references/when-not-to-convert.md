@@ -8,14 +8,14 @@ likely to commit. Before applying any pattern from `patterns.md`, check it again
 
 A dict is the **correct** type — do not convert to a dataclass — when:
 
-- **Keys are unknown or user-defined.** e.g. a function returns a scalar result plus an
-  open-ended bag of extra info to be logged: `{"value": 1.2, "p_mean": ..., "p_std": ...}`,
+- **Keys are unknown or user-defined.** e.g. a function returns a known result plus an
+  open-ended bag of extra metrics to log: `{"value": 1.2, "mean": ..., "std": ...}`,
   where the extra keys are whatever the user chose. Model the known part as a field and keep
-  the unknown part as a dict: `FunctionValue(value=..., info=dict[str, Any])`.
-- **Keys vary at runtime / are data, not schema.** e.g. a collection of benchmark problems
-  keyed by problem name, where which names exist depends on what the user requested. A
-  fixed-field class can't represent "merge two benchmark sets" or "filter by name". Use
-  `dict[str, BenchmarkProblem]` — the *value* type is strict, the keys stay dynamic.
+  the unknown part as a dict: `Result(value=..., info=dict[str, Any])`.
+- **Keys vary at runtime / are data, not schema.** e.g. a collection of datasets keyed by
+  name, where which names exist depends on what the user loaded. A fixed-field class can't
+  represent "merge two collections" or "filter by name". Use `dict[str, Dataset]` — the
+  *value* type is strict, the keys stay dynamic.
 - **Pass-through configuration** handed to some other library you don't control, e.g.
   `scatter_kws` forwarded to a plotting backend. You can't enumerate the keys; a dict (or
   `Mapping[str, Any]`) is honest.
@@ -34,7 +34,7 @@ known keys and checker support without forcing callers onto a class.
 
 Don't launder a genuinely-dynamic value through a fake-precise type. Legitimate `Any`
 (or `object`, which is safer):
-- truly arbitrary user payloads (additional criterion args, opaque context objects);
+- truly arbitrary user payloads (extra args forwarded to a user callback, opaque context objects);
 - the boundary of (de)serialization before validation;
 - deliberately-generic plumbing that forwards values it never inspects.
 Prefer `object` over `Any` when you only store/forward the value (it forces a checked

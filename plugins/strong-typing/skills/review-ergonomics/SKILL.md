@@ -36,7 +36,7 @@ Reason about what an editor (Pylance/pyright, PyCharm) would show a caller:
 - [ ] **dynamic signatures** (`functools.wraps`, signature built at runtime, decorators that
       erase params) — most editors won't complete these. Flag where autocomplete is silently
       lost, and note the trade-off.
-- [ ] **config via a dict** where an object would complete — `algo_options={"max_iter": ...}`
+- [ ] **config via a dict** where an object would complete — `options={"timeout": 30}`
       offers no completion; a configured object/`with_*` constructor does.
 - [ ] **discoverability of choices** — when there are many valid options (algorithms, modes),
       can the user *find* them by typing `lib.<TAB>`? Consider whether a typed namespace /

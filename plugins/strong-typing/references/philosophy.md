@@ -56,8 +56,8 @@ is choosing the right data types.
      frozen dataclass whose fields are the configuration and which carries the behavior as a
      method — often `__call__`, or a named method fixed by a `Protocol`/ABC. One immutable,
      validated, autocomplete-friendly object then replaces *both* the string selector and the
-     loose options dict (e.g. `strategy=Lbfgsb(max_iter=1000)` instead of
-     `strategy="lbfgsb", options={...}`). Per point 4, a widely-used entry point can still
+     loose options dict (e.g. `compression=Gzip(level=9)` instead of
+     `compression="gzip", options={...}`). Per point 4, a widely-used entry point can still
      also accept the bare `str`/`Callable` for convenience and normalize to the object. See
      `patterns.md`.
 
