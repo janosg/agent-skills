@@ -24,7 +24,7 @@
     {
       "name": "strong-typing",
       "source": "strong-typing",
-      "description": "Migrate Python codebases from stringly-typed to strongly-typed. One user-invoked skill (/strong-typing:migrate) for proposals, plans, refactors, and reviews.",
+      "description": "Migrate Python codebases from stringly-typed to strongly-typed. One user-invoked skill (/strong-typing:strong-typing) for proposals, plans, refactors, and reviews.",
       "version": "0.1.0",
       "author": {
         "name": "Janos Gabler",

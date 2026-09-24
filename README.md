@@ -38,17 +38,17 @@ adding type hints: prefer immutable dataclasses (and enums, tagged unions) when 
 known, keep dicts when keys are dynamic, and design types so illegal states can't be
 expressed.
 
-One user-invoked skill, `migrate`. The request sets the form of the work; the skill's canon
-sets the substance:
+One user-invoked skill, `strong-typing`. The request sets the form of the work; the skill's
+canon sets the substance:
 
 ```text
-/strong-typing:migrate write an enhancement proposal for moving this library to strong typing
-/strong-typing:migrate refactor the config module to strong typing
-/strong-typing:migrate review this diff for over- and under-typing
+/strong-typing:strong-typing write an enhancement proposal for moving this library to strong typing
+/strong-typing:strong-typing refactor the config module to strong typing
+/strong-typing:strong-typing review this diff for over- and under-typing
 ```
 
 `SKILL.md` carries the ten principles and a pattern index; the detail lives beside it in
-`skills/migrate/references/`:
+`skills/strong-typing/references/`:
 
 | File | Holds |
 | --- | --- |

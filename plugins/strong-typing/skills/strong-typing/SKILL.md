@@ -1,5 +1,5 @@
 ---
-name: migrate
+name: strong-typing
 description: Refactor Python code from stringly typed to strongly typed. Use it for an enhancement proposal, a migration plan, a module refactor, or a review of a diff.
 disable-model-invocation: true
 ---

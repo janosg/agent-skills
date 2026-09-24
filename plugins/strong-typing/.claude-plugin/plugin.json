@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "strong-typing",
-  "description": "Migrate Python codebases from stringly-typed to strongly-typed. One user-invoked skill (/strong-typing:migrate) that writes proposals, plans, refactors, or reviews from a shared design canon: dataclasses over dicts when fields are known, dicts when dynamic; generous-in/strict-out; immutability.",
+  "description": "Migrate Python codebases from stringly-typed to strongly-typed. One user-invoked skill (/strong-typing:strong-typing) that writes proposals, plans, refactors, or reviews from a shared design canon: dataclasses over dicts when fields are known, dicts when dynamic; generous-in/strict-out; immutability.",
   "version": "0.1.0",
   "author": {
     "name": "Janos Gabler",
