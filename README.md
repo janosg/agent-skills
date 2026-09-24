@@ -34,25 +34,30 @@ agent-skills/
 ### `strong-typing`
 
 Migrate a Python codebase from *stringly-typed* to *strongly-typed* — which means more than
-adding type hints: prefer immutable dataclasses (and enums, tagged unions, `NewType`) when
-fields are known, keep dicts when keys are dynamic, and design types so illegal states can't
-be expressed. All skills share one canon in `plugins/strong-typing/references/`
-(`philosophy.md`, `patterns.md`, `when-not-to-convert.md`, `tooling.md`).
+adding type hints: prefer immutable dataclasses (and enums, tagged unions) when fields are
+known, keep dicts when keys are dynamic, and design types so illegal states can't be
+expressed.
 
-A four-stage pipeline plus three grouped reviews:
+One user-invoked skill, `migrate`. The request sets the form of the work; the skill's canon
+sets the substance:
 
-| Skill | Stage | Does |
-| --- | --- | --- |
-| `design-proposal` | plan | Audits the stringly-typed surface and writes an enhancement-proposal-style design doc. Asks up front whether breaking changes are allowed or need a deprecation period; scales between libraries (full public-API + deprecation treatment) and internal/app code. |
-| `implementation-plan` | plan | Turns the proposal into small, independently-reviewable PR steps that each keep the repo green; sequences with deprecation shims and marks independent vs. sequential steps. |
-| `implement` | build | Executes **one** step at a time, applying the canon, with a hard rule to stay in scope and not run ahead. |
-| `review-types` | review | Were the right types chosen? Catches under-typing *and* over-typing (dynamic dicts wrongly frozen, needless `NewType`s, harmful subclassing). |
-| `review-ergonomics` | review | Does it produce good IDE autocomplete, and do the docs leverage the types? |
-| `review-safety` | review | Generous-in/strict-out boundary, deprecation correctness, a genuinely-clean type checker, retained runtime validation, unrepresentable illegal states. |
+```text
+/strong-typing:migrate write an enhancement proposal for moving this library to strong typing
+/strong-typing:migrate refactor the config module to strong typing
+/strong-typing:migrate review this diff for over- and under-typing
+```
 
-Typical flow: `design-proposal` → `implementation-plan` → (`implement` → `review-*`) per step.
-Reviews default to the current diff so they slot in after each `implement` step, but also run
-whole-repo on request.
+`SKILL.md` carries the ten principles and a pattern index; the detail lives beside it in
+`skills/migrate/references/`:
+
+| File | Holds |
+| --- | --- |
+| `philosophy.md` | The full rationale behind the principles. |
+| `patterns/` | One file per before/after pattern: `enum`, `dataclass-record`, `tagged-union`, `construction-functions`, `typestate`, `immutable-config`, `options-argument`, `strategy-object`, `boundary`. |
+| `when-not-to-convert.md` | Guardrails against over-conversion: dynamic dicts, honest `Any`, legitimate mutability, composition over subclassing. |
+| `migration-strategy.md` | Library vs. internal code, the drop / deprecate / keep decision, what a proposal covers, the order that keeps every step mergeable. |
+| `type-checker.md` | Strict mypy/pyright config, the per-module ratchet, CI and pre-commit. |
+| `documentation.md` | Types out of docstrings, per-attribute docstrings, featuring the strict path, what defeats autocomplete. |
 
 ## Using this marketplace
 

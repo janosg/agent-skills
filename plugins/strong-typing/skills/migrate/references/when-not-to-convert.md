@@ -1,25 +1,25 @@
-# Strong Typing — When NOT to Convert (Guardrails)
+# When NOT to convert
 
-Strong typing is about choosing the *right* type, not the *most* type. Over-application is
-as much a failure as stringly-typed code — and it's the failure an automated agent is most
-likely to commit. Before applying any pattern from `patterns.md`, check it against this list.
+Strong typing is about choosing the *right* type, not the *most* type. Over-conversion is as
+much a failure as stringly-typed code, and it's the failure an automated refactor is most
+likely to commit. Before applying any pattern from `patterns/`, check it against this list.
 
 ## Keep the dict when the keys are dynamic
 
-A dict is the **correct** type — do not convert to a dataclass — when:
+A dict is the **correct** type, not to be converted to a dataclass, when:
 
 - **Keys are unknown or user-defined.** e.g. a function returns a known result plus an
-  open-ended bag of extra metrics to log: `{"value": 1.2, "mean": ..., "std": ...}`,
-  where the extra keys are whatever the user chose. Model the known part as a field and keep
-  the unknown part as a dict: `Result(value=..., info=dict[str, Any])`.
+  open-ended bag of extra metrics to log: `{"value": 1.2, "mean": ..., "std": ...}`, where
+  the extra keys are whatever the user chose. Model the known part as a field and keep the
+  unknown part as a dict: `Result(value=..., info=dict[str, Any])`.
 - **Keys vary at runtime / are data, not schema.** e.g. a collection of datasets keyed by
   name, where which names exist depends on what the user loaded. A fixed-field class can't
-  represent "merge two collections" or "filter by name". Use `dict[str, Dataset]` — the
+  represent "merge two collections" or "filter by name". Use `dict[str, Dataset]`: the
   *value* type is strict, the keys stay dynamic.
 - **Pass-through configuration** handed to some other library you don't control, e.g.
   `scatter_kws` forwarded to a plotting backend. You can't enumerate the keys; a dict (or
   `Mapping[str, Any]`) is honest.
-- **The mapping IS the abstraction** — registries, caches, sparse lookups, counts by label.
+- **The mapping IS the abstraction**: registries, caches, sparse lookups, counts by label.
 
 Rule of thumb: **strict on the value type, loose on the keys.** `dict[str, Problem]` is
 strongly typed; `dict[str, Any]` with secretly-fixed keys is not.
@@ -32,11 +32,14 @@ known keys and checker support without forcing callers onto a class.
 
 ## `Any` is sometimes the honest type
 
-Don't launder a genuinely-dynamic value through a fake-precise type. Legitimate `Any`
-(or `object`, which is safer):
-- truly arbitrary user payloads (extra args forwarded to a user callback, opaque context objects);
+Don't launder a genuinely-dynamic value through a fake-precise type. Legitimate `Any` (or
+`object`, which is safer):
+
+- truly arbitrary user payloads (extra args forwarded to a user callback, opaque context
+  objects);
 - the boundary of (de)serialization before validation;
 - deliberately-generic plumbing that forwards values it never inspects.
+
 Prefer `object` over `Any` when you only store/forward the value (it forces a checked
 narrowing before use). Reserve `Any` for where even that is too strict.
 
@@ -44,25 +47,29 @@ narrowing before use). Reserve `Any` for where even that is too strict.
 
 If describing one parameter takes five nested generics, **stop**. A type like
 `dict[str, list[tuple[int, Callable[..., dict[str, Any]]]]]` is a design smell. Either:
+
 - introduce named intermediate types (often a dataclass or two) that make the structure
   readable, or
 - accept a deliberately looser type at that spot.
+
 A parameter that can legitimately be "a number, a tuple of strings, or a dict of dicts" is
 telling you to refactor the function, not to write a bigger `Union`.
 
 ## Don't add ceremony that prevents no real error
 
-- **An Enum/dataclass with a single member or single use** rarely earns its keep — a
-  `Literal` or a plain value may be clearer.
+- **An Enum/dataclass with a single member or single use** rarely earns its keep; a `Literal`
+  or a plain value may be clearer.
 - Each new type should buy a prevented bug, better autocomplete, or clearer code. If it buys
   none, don't introduce it.
 
 ## Mutability is sometimes right
 
 Default to `frozen=True`, but don't contort code to avoid all mutation:
+
 - genuine accumulators, buffers, caches, and builders are naturally mutable;
 - large objects rebuilt frequently in a hot loop may justify in-place mutation for
   performance.
+
 Prefer "immutable + copy constructor" first; fall back to documented mutability when copying
 is wrong or too costly. Never use a mutable default (`field(default_factory=...)`, not
 `= []`).
@@ -70,12 +77,13 @@ is wrong or too costly. Never use a mutable default (`field(default_factory=...)
 ## Don't break public APIs for purity (libraries)
 
 Type-driven cleanups must not silently break users. For anything public:
+
 - keep the old interface working through a **deprecation cycle** (accept the old type, warn,
-  convert);
-- the "generous inputs" principle exists partly for this — keep accepting `str`/dict at the
+  convert) unless the maintainer has chosen to drop it;
+- the "generous inputs" principle exists partly for this: keep accepting `str`/dict at the
   boundary even after introducing the strict type.
-See `design-proposal` (it asks up front whether breaking changes are allowed) and
-`tooling.md`.
+
+See `migration-strategy.md` for the compatibility decision.
 
 ## Don't delete runtime validation
 
@@ -85,18 +93,7 @@ checks and `__post_init__` invariants.
 
 ## Prefer composition over (most) subclassing
 
-When reducing duplication among related types, reach for composition first. Subclass only
-for genuine subtyping (Liskov-substitutable), and prefer shallow hierarchies with abstract
-base classes / `Protocol`s over deep concrete inheritance. Inheriting to share a few helpers
-often couples things that should stay independent.
-
-## The over-conversion checklist (for reviews)
-
-A change is **over-converted** if any of these is true:
-- a dict whose keys are dynamic/user-defined was frozen into a dataclass/`TypedDict`;
-- a type acquired deep nesting instead of a named intermediate or a looser type;
-- an Enum/dataclass was added where no real misuse was possible;
-- `frozen=True` was forced onto something that genuinely needs mutation, adding awkward copies;
-- a public signature got *stricter* (narrower input) without a deprecation path;
-- runtime validation was dropped in favor of "the types cover it";
-- inheritance was introduced where composition was simpler and looser coupling was lost.
+When reducing duplication among related types, reach for composition first. Subclass only for
+genuine subtyping (Liskov-substitutable), and prefer shallow hierarchies with abstract base
+classes / `Protocol`s over deep concrete inheritance. Inheriting to share a few helpers often
+couples things that should stay independent.
