@@ -1,15 +1,15 @@
 ---
-name: strong-typing
-description: Refactor Python code from stringly typed to strongly typed. Use it for an enhancement proposal, a migration plan, a module refactor, or a review of a diff.
+name: type-driven-design
+description: Type-driven design for Python. Take code from stringly typed to strongly typed by choosing data types that make illegal states unrepresentable. Use it for an enhancement proposal, a migration plan, a module refactor, or a review of a diff.
 disable-model-invocation: true
 ---
 
-# Strong typing
+# Type-driven design
 
-*Strongly typed* means more than type hints. The goal is **soundness**: interfaces that are
-hard or impossible to misuse, so that whole classes of bugs become unrepresentable rather
-than tested-for. Hints are necessary but not sufficient; the real work is choosing the right
-data types.
+Type-driven design takes Python from *stringly typed* to *strongly typed*, which means more
+than type hints. The goal is **soundness**: interfaces that are hard or impossible to misuse,
+so that whole classes of bugs become unrepresentable rather than tested-for. Hints are
+necessary but not sufficient; the real work is choosing the right data types.
 
 The request sets the form of the work: an enhancement proposal, a migration plan, the
 refactor of one module, a review of a diff. The canon below sets the substance in every
