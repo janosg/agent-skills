@@ -9,23 +9,28 @@ rulebook, enforced (if at all) by runtime asserts and boolean flags.
 
 ```python
 # after: each state is its own type; you can only reach the next via the previous
-def connect(address: str) -> ConnectedClient | None: ...
+from collections.abc import Iterator
+from contextlib import contextmanager
+
+@contextmanager
+def connect(address: str) -> Iterator[ConnectedClient]: ...   # raises if it can't connect
 
 class ConnectedClient:
-    def authenticate(self, password: str) -> AuthenticatedClient | None: ...
+    def authenticate(self, password: str) -> AuthenticatedClient: ...   # raises on failure
 
 class AuthenticatedClient:
     def send(self, msg: str) -> None: ...
-```
 
-For "cannot use after close", drop `close()` and expose a context manager so the resource is
-released at block exit and can't be used afterward:
-
-```python
-with connect(addr) as client:      # ConnectedClient/AuthenticatedClient
+with connect(addr) as conn:
+    client = conn.authenticate(password)
     client.send("hi")
-# closed here; no way to call a closed client
+# released here
 ```
+
+Failure raises instead of returning `| None`, so every state stays non-optional. The context
+manager replaces `close()`: release happens at block exit, and there is no `close()` to call
+twice. It guarantees release, not unusability: a reference that outlives the block still
+type-checks.
 
 **When:** an object moves through mutually exclusive lifecycle states. Splitting them makes
 illegal sequences unrepresentable instead of runtime-checked.

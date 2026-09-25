@@ -7,7 +7,7 @@ impossible field combinations representable.
 # after
 @dataclass(frozen=True)
 class Header:
-    protocol: Protocol
+    version: int
     size: int
 
 @dataclass(frozen=True)
@@ -29,7 +29,7 @@ from typing import assert_never
 
 def handle(packet: Packet) -> None:
     match packet:
-        case Header(protocol, size): ...
+        case Header(version, size): ...
         case Payload(data): ...
         case Trailer(data, checksum): ...
         case _: assert_never(packet)   # the checker errors here if a variant is unhandled

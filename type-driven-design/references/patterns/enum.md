@@ -17,7 +17,7 @@ class ErrorHandling(Enum):
     RAISE = "raise"
     CONTINUE = "continue"
 
-# public boundary stays generous: accept the string, normalize to the enum
+# public boundary stays generous: accept the string, parse it into the enum
 def run(error_handling: ErrorHandling | str = ErrorHandling.RAISE):
     error_handling = ErrorHandling(error_handling)   # ValueError on a bad string
     if error_handling is ErrorHandling.RAISE: ...

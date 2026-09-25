@@ -42,8 +42,7 @@ User-invoked. The request sets the form of the work; the skill's canon sets the 
 
 | File | Holds |
 | --- | --- |
-| `patterns/` | One file per before/after pattern: `enum`, `dataclass-record`, `tagged-union`, `construction-functions`, `typestate`, `immutable-config`, `options-argument`, `strategy-object`, `boundary`. |
-| `when-not-to-convert.md` | Guardrails against over-conversion: dynamic dicts, honest `Any`, legitimate mutability, composition over subclassing. |
+| `patterns/` | One file per pattern: `enum`, `dataclass-record`, `tagged-union`, `typestate`, `immutable-config`, `options-argument`, `strategy-object`, `boundary`. |
 | `migration-strategy.md` | Library vs. internal code, the drop / deprecate / keep decision, what a proposal covers, the order that keeps every step mergeable. |
-| `type-checker.md` | Strict mypy/pyright config, the per-module ratchet, CI and pre-commit. |
+| `type-checker.md` | Strict checker config, the per-module ratchet, CI and pre-commit. |
 | `documentation.md` | Types out of docstrings, per-attribute docstrings, featuring the strict path, what defeats autocomplete. |

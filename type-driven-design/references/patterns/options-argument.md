@@ -22,5 +22,5 @@ def fetch(..., cache: bool | CacheOptions = False): ...
 
 **When:** any "enable + configure" pair. Collapse to `bool | OptionsObject`: `False`/`True`
 keep the zero-import easy path, the object gives discoverable, validated, immutable config.
-The same idea covers `logging: bool | str | Path | Logger` and similar. Normalize to the
+The same idea covers `logging: bool | str | Path | Logger` and similar. Parse into the
 object once, at the [boundary](boundary.md).

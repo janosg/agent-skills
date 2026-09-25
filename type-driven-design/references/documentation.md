@@ -1,8 +1,5 @@
 # Documentation and autocomplete
 
-Once types carry the information, the docs lean on them and the editor becomes part of the
-documentation.
-
 ## Docstrings
 
 - **Types out of docstrings.** They live in the signature; duplicated in prose they rot.
@@ -13,40 +10,19 @@ documentation.
   rot into a stale wall of text.
 
 ```python
-from dataclasses import dataclass
-from typing import ClassVar
-
-
 @dataclass(frozen=True)
 class ExponentialBackoff:
-    """Retry policy whose wait grows geometrically between attempts.
-
-    Each failed attempt waits `factor` times longer than the previous one,
-    starting from `base_delay`. Retrying stops once `max_attempts` is reached;
-    if `max_attempts` is None, the number of attempts is unbounded.
-    """
-
-    name: ClassVar[str] = "exponential"
+    """Retry policy whose wait grows geometrically between attempts."""
 
     base_delay: float = 0.1
     """Delay before the first retry, in seconds. Must be >= 0."""
-
-    factor: float = 2.0
-    """Multiplier applied to the delay after each failed attempt. Must be > 1."""
-
-    max_attempts: int | None = None
-    """Hard cap on the number of attempts.
-
-    If None, the number of attempts is unbounded.
-    """
 ```
 
 ## User docs
 
 - **Feature the strict, autocomplete-friendly way first.** When several input styles are
   supported (object, string, dict), show the discoverable one; legacy styles go in tabs or
-  expandable boxes, not deleted.
-- **Examples import and use the new types**, so readers learn the good path.
+  expandable boxes, not deleted. Examples import and use the new types.
 
 ## What defeats autocomplete
 

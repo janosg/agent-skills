@@ -1,41 +1,23 @@
 # Dict with known keys, or unnamed tuple → frozen dataclass
 
-**Smell:** a `dict[str, Any]` whose keys are fixed and known at design time, or a return of
-`tuple[str, str, int]`. No autocomplete, renames are search-and-replace, the type says nothing
-about shape, callers must read the producer's body to learn the keys, and tuples unpack
-silently in the wrong order.
+**When:** all fields are known and stable at design time. Convert a tuple once it has more
+than ~2 elements or its elements aren't obviously interchangeable.
 
-```python
-# before
-def find_person(...) -> dict[str, Any]:
-    return {"name": ..., "city": ..., "age": ...}
+**Unless the keys are data, not schema.** Then keep the dict, strict on the value type:
+`dict[str, Dataset]` is strongly typed; `dict[str, Any]` with secretly fixed keys is not.
 
-def find_person(...) -> tuple[str, str, int]: ...     # name? surname? age? ssn?
-```
+- **User-defined keys**, e.g. a result plus whatever extra metrics the user chose to log:
+  model the known part as fields and keep the open part as a dict,
+  `Result(value=..., info=dict[str, Any])`.
+- **Keys that vary at runtime**, e.g. datasets keyed by name where the names depend on what
+  was loaded. A fixed-field class can't express "merge two collections" or "filter by name".
+- **Pass-through configuration** forwarded to a library you don't control, e.g.
+  `scatter_kws`: `Mapping[str, Any]` is honest.
+- **The mapping is the abstraction**: registries, caches, sparse lookups, counts by label.
 
-```python
-# after
-from dataclasses import dataclass
+A fixed shape can still call for a different type:
 
-@dataclass(frozen=True)
-class Person:
-    name: str
-    city: City
-    age: int
-
-def find_person(...) -> Person: ...
-```
-
-**When:** all fields are known and stable. Renames become an editor refactor, the type
-checker finds every caller when the shape changes, and IDEs autocomplete attributes. For a
-tuple, convert once it has more than ~2 elements or its elements aren't obviously
-interchangeable.
-
-**Unless:**
-
-- keys are dynamic, unknown, or user-supplied: keep the dict, strict on the value type. See
-  `../when-not-to-convert.md`;
-- the shape is fixed but a real `dict` is structurally required (JSON interop, `**kwargs`, a
-  wire contract): `TypedDict`;
-- you truly need tuple behavior (iteration, unpacking, backwards-compatible positional
-  access): `NamedTuple`.
+- a real `dict` is structurally required (JSON interop, `**kwargs`, a wire contract):
+  `TypedDict`;
+- tuple behavior is needed (iteration, unpacking, backwards-compatible positional access):
+  `NamedTuple`.

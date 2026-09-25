@@ -35,7 +35,7 @@ optimization algorithms. Bundling configuration (frozen fields, validated in `__
 discoverable via autocomplete) with behavior (the method) into one immutable object replaces
 both the selector and the dict. Fix the method name with a `Protocol` or ABC so all strategies
 are interchangeable. A widely-used entry point can still accept the bare `str`/`Callable` for
-convenience and normalize to the object at the [boundary](boundary.md).
+convenience and parse it into the object at the [boundary](boundary.md).
 
 **Prefer this over an enum of methods.** An Enum can name *which* strategy but can't run it or
 hold its configuration; you'd still need a dispatch table plus a separate options dict.
