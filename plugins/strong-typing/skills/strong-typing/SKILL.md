@@ -65,8 +65,8 @@ cases where the loose version is correct. Check every conversion against
 - A public API, or work spanning several modules → `references/migration-strategy.md`:
   the compatibility decision (drop / deprecate / keep), what a proposal covers, the order
   that keeps every step mergeable, and how to split changes that resist being small.
-- Setting up or tightening the type checker → `references/type-checker.md`: strict config,
-  the per-module ratchet, CI and pre-commit.
+- Setting up or tightening the type checker → `references/type-checker.md`: which checker,
+  strict settings, the per-module ratchet, CI and pre-commit.
 - Docstrings and user docs → `references/documentation.md`: types out of docstrings,
   per-attribute docstrings, feature the strict path, what defeats autocomplete.
 
@@ -74,6 +74,9 @@ cases where the loose version is correct. Check every conversion against
 
 - Convert what the request names. Further opportunities you notice go into a follow-up list
   for the user, not into the diff.
+- Use the type checker the repo already uses; infer it from its config, CI, pre-commit, and
+  dependency files. If none is set up, ask the user which one they want before setting one
+  up or reporting checker output. Never pick one for them.
 - Run the type checker and the tests on the touched package and report the real output. A
   `# type: ignore`, `cast`, or `Any` added to silence the checker is a finding, not a fix.
 - When reviewing, weight over-conversion at least as heavily as under-typing, and name the

@@ -7,7 +7,7 @@ than merely tested-for. Type hints are necessary but not sufficient; the real wo
 the right data types.
 
 > Mental model: in Rust, an incorrectly used interface fails to compile. In Python we can't
-> get that for free, but with strict types + a type checker (mypy/pyright) we get most of the
+> get that for free, but with strict types + a type checker we get most of the
 > same fast feedback, and with the right data design we make many illegal states impossible
 > to express at all.
 
