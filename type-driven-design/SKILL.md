@@ -13,7 +13,7 @@ necessary but not sufficient; the real work is choosing the right data types.
 
 The request sets the form of the work: an enhancement proposal, a migration plan, the
 refactor of one module, a review of a diff. The canon below sets the substance in every
-form. `references/philosophy.md` holds the full rationale for when a judgment call is hard.
+form.
 
 ## Principles
 
@@ -30,7 +30,9 @@ form. `references/philosophy.md` holds the full rationale for when a judgment ca
 5. **Immutable by default.** `frozen=True`, with copy constructors (`with_x(...)`) where a
    modified version is needed.
 6. **Functions as entry points; objects for configuration, strategies, and results.**
-   `do_thing(config)` beats `config.run()`. Pluggable behavior is a configured strategy
+   Objects bring safety and autocomplete; functions stay beginner-friendly and compose.
+   `do_thing(config)` beats `config.run()`: running several configs in parallel is one more
+   function, not a new interface on the object. Pluggable behavior is a configured strategy
    object, not `str | Callable` plus an options dict.
 7. **Named construction functions over an overloaded `__init__`.**
 8. **Keep runtime validation.** Most end users never run a type checker. Validate at the

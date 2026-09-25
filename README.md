@@ -42,7 +42,6 @@ User-invoked. The request sets the form of the work; the skill's canon sets the 
 
 | File | Holds |
 | --- | --- |
-| `philosophy.md` | The full rationale behind the principles. |
 | `patterns/` | One file per before/after pattern: `enum`, `dataclass-record`, `tagged-union`, `construction-functions`, `typestate`, `immutable-config`, `options-argument`, `strategy-object`, `boundary`. |
 | `when-not-to-convert.md` | Guardrails against over-conversion: dynamic dicts, honest `Any`, legitimate mutability, composition over subclassing. |
 | `migration-strategy.md` | Library vs. internal code, the drop / deprecate / keep decision, what a proposal covers, the order that keeps every step mergeable. |
