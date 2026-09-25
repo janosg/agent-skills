@@ -21,7 +21,8 @@ scales with reach: a single-caller helper demands the exact type; a function imp
 the codebase meets its callers where they are. Keep the convenience (and the backwards
 compatibility, see `../migration-strategy.md`) at the edge; keep the core free of
 `if`-laddering over input shapes. The parse site is also where runtime validation lives,
-so a bad input fails early with a clear message.
+so a bad input fails early with a clear message. For a record users construct directly, a
+[pydantic dataclass](pydantic-dataclass.md) can be its own boundary.
 
 **Unless:** the output really is heterogeneous. Then name the heterogeneity with a
 [tagged union](tagged-union.md) rather than returning `dict[str, Any]`.

@@ -36,7 +36,8 @@ form.
    subtyping, and fix shared interfaces with a `Protocol` or ABC.
 7. **Named construction functions over an overloaded `__init__`.**
 8. **Keep runtime validation.** Most end users never run a type checker. Validate at the
-   boundary and in `__post_init__`.
+   boundary and in `__post_init__`, or, if pydantic is an acceptable dependency, let
+   pydantic dataclasses and constrained types (`PositiveFloat`) do it declaratively.
 9. **Backwards compatibility is a decision, not a default: ask.** Whether an old interface
    is dropped, deprecated, or kept depends on users, stability promises, and release cadence.
    Record the answer before designing public changes.
@@ -58,6 +59,7 @@ including the cases where the loose version is correct.
 | a "kind" field plus optional fields | [tagged union + `assert_never`](references/patterns/tagged-union.md) | the set of kinds is open-ended |
 | an `__init__` with many mutually exclusive optionals | named `from_*` classmethods | one obvious construction path |
 | an object with an ordered-call rulebook | [typestate or context manager](references/patterns/typestate.md) | the states are not mutually exclusive |
+| a `__post_init__` checking or converting field by field | [pydantic dataclass + constrained types](references/patterns/pydantic-dataclass.md) | pydantic is not an acceptable dependency |
 | config mutated in place | [`frozen=True` + `with_*`](references/patterns/immutable-config.md) | it genuinely must mutate |
 | `flag: bool` + `flag_options: dict` | [`bool` or options object](references/patterns/options-argument.md) | — |
 | pluggable `str`/`Callable` + options dict | [configured strategy object](references/patterns/strategy-object.md) | the behavior has no config or variants |
